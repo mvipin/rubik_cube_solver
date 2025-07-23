@@ -5,7 +5,7 @@
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/wangyuyyt/rubik_cube_solver)
 [![Version](https://img.shields.io/badge/Version-1.0.0-orange.svg)](https://github.com/wangyuyyt/rubik_cube_solver/releases)
 
-An intelligent robotic system that automatically solves Rubik's cubes using advanced computer vision, machine learning, and precision motor control. The system captures cube images, detects colors using CNN and decision tree models, determines the cube state, and executes solving moves through stepper motor control.
+An intelligent robotic system that automatically solves Rubik's cubes using advanced computer vision, machine learning, and precision motor control. The system captures cube images through a single-camera dual-orientation setup, detects colors using CNN and decision tree models, determines the cube state, and executes solving moves through stepper motor control.
 
 **Tech Stack:** Python • OpenCV • TensorFlow/Keras • Arduino • Stepper Motors • Computer Vision • Machine Learning • Color Detection • G-code • Serial Communication
 
@@ -13,10 +13,10 @@ An intelligent robotic system that automatically solves Rubik's cubes using adva
 
 ## 🎯 Project Overview
 
-This project combines mechanical engineering, computer vision, and machine learning to create an autonomous Rubik's cube solving robot. The system uses a dual-camera setup with controlled lighting to capture cube images, processes them through trained neural networks for color detection, applies the Kociemba solving algorithm, and executes the solution using precision stepper motors controlled via G-code commands.
+This project combines mechanical engineering, computer vision, and machine learning to create an autonomous Rubik's cube solving robot. The system uses a single camera with controlled lighting to capture cube images in two orientations, processes them through trained neural networks for color detection, applies the Kociemba solving algorithm, and executes the solution using precision stepper motors controlled via G-code commands.
 
 ### Key Features
-- 🔍 **Computer Vision Pipeline**: Dual-image capture system with controlled lighting
+- 🔍 **Computer Vision Pipeline**: Single-camera dual-orientation capture system with controlled lighting
 - 🧠 **Machine Learning Models**: CNN and decision tree approaches for robust color detection
 - ⚙️ **Precision Motor Control**: 6-axis stepper motor system with G-code interface
 - 🎲 **Kociemba Algorithm**: Optimal cube solving in minimal moves
@@ -31,7 +31,7 @@ This project combines mechanical engineering, computer vision, and machine learn
 |-----------|--------------|---------|----------|
 | **Stepper Motors** | NEMA 17, 1.8° step angle | Cube face rotation (6 axes: U,R,F,D,L,B) | 6 |
 | **Motor Drivers** | A4988/DRV8825 | Stepper motor control with microstepping | 6 |
-| **Camera Module** | USB/Pi Camera, 1080p | Dual-angle cube image capture | 1 |
+| **Camera Module** | USB/Pi Camera, 1080p | Single-camera dual-orientation cube capture | 1 |
 | **LED Flash System** | CHANZON 3W White LED (6000K-6500K) | Controlled lighting for color detection | 4 |
 | **NPN Transistors** | 2N2222/BC547 | LED switching circuits | 4 |
 | **Voltage Regulators** | LM7805, LM317 | 5V/3.3V power distribution | 2 |
@@ -90,10 +90,16 @@ src/
 #### 1. Image Capture System
 ```python
 def capture_pictures(self, repeat_times=1, output_path=''):
-    """Dual-angle image capture with controlled lighting"""
-    # First image: U, L, F faces visible
-    # Second image: D, R, B faces visible (after cube flip)
+    """Single-camera dual-orientation image capture with controlled lighting"""
+    # First orientation: U, L, F faces visible
+    # Manual cube repositioning required between captures
+    # Second orientation: D, R, B faces visible (after cube flip)
 ```
+
+The system employs a single camera positioned to capture the Rubik's cube in two distinct orientations:
+- **First Capture**: Shows the Upper (U), Left (L), and Front (F) faces
+- **Manual Repositioning**: User flips the cube to expose the opposite faces
+- **Second Capture**: Shows the Down (D), Right (R), and Back (B) faces
 
 #### 2. Color Detection Models
 
@@ -155,7 +161,7 @@ class RubicControler:
 
 1. **Motor Mount Assembly**: Install 6 NEMA 17 stepper motors in the cube manipulation frame
 2. **Electronics Integration**: Connect motor drivers to Arduino/controller board
-3. **Camera Setup**: Position camera for dual-angle cube capture
+3. **Camera Setup**: Position single camera for optimal dual-orientation cube capture
 4. **Lighting System**: Install 4x 3W LED modules with NPN switching circuits
 5. **Power Distribution**: Connect 12V PSU with voltage regulation for 5V/3.3V rails
 
@@ -195,7 +201,7 @@ self.cam = cv2.VideoCapture(0)  # Adjust device index
 from src import run
 
 # 1. Detect current cube state
-run.detect()  # Captures images and analyzes colors
+run.detect()  # Captures images in two orientations and analyzes colors
 
 # 2. Scramble cube (optional)
 run.scramble()  # Performs random moves
@@ -233,7 +239,7 @@ moves = kociemba.solve(cube_status).split()
 |---------------|-------|-------|
 | **Solving Speed** | 30-60 seconds | Including detection time |
 | **Move Precision** | ±0.1° | Stepper motor accuracy |
-| **Detection Time** | 5-10 seconds | Dual image processing |
+| **Detection Time** | 5-10 seconds | Dual-orientation processing |
 | **Power Consumption** | 60W peak | During motor operation |
 
 ### Cube State Representation
@@ -249,7 +255,7 @@ UUUUUUUUU RRRRRRRRR FFFFFFFFF DDDDDDDDD LLLLLLLLL BBBBBBBBB
 ### Common Issues
 
 **Color Detection Errors:**
-- Ensure consistent lighting conditions
+- Ensure consistent lighting conditions between both orientations
 - Recalibrate camera white balance
 - Retrain models with current lighting setup
 
@@ -260,7 +266,7 @@ UUUUUUUUU RRRRRRRRR FFFFFFFFF DDDDDDDDD LLLLLLLLL BBBBBBBBB
 
 **Cube State Validation Failures:**
 - Manual correction via interactive interface
-- Verify camera positioning and focus
+- Verify camera positioning and focus for both orientations
 - Check for cube sticker wear/damage
 
 ### Debug Commands
@@ -294,9 +300,15 @@ controller.test_motors()
 - **Adaptive Lighting**: Dynamic illumination optimization
 - **Predictive Maintenance**: Motor wear detection and compensation
 
+## 🤝 Contributors
+
+Special thanks to the contributors who helped design and implement key system components:
+
+- **Image Capture Architecture**: Design and implementation of the single-camera dual-orientation capture system that enables complete cube state detection through strategic positioning and manual cube repositioning.
+
 ## 📚 References
 
-- **Project Video**: [Rubik's Cube Solver Demo](https://www.youtube.com/watch?v=ZueyBALjHd4&list=PLFdXroxJNTmh6OWGKO7Z361gLhLbBCzVf&index=1)
+- **Project Video**: [Rubik's Cube Solver Demo](https://youtu.be/mwZZhnmK3QI)
 - **Kociemba Algorithm**: [Two-Phase Algorithm Implementation](https://github.com/muodov/kociemba)
 - **Hardware Reference**: [Similar Cube Solver Project](https://github.com/mvipin/rubik_cube_solver)
 - **LED Specifications**: CHANZON High Power LED Chip 3W White 6000K-6500K
